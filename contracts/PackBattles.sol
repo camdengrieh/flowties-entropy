@@ -11,7 +11,9 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
     event RandomItemSelected(string item, uint256 index);
     event GameCreated(uint256 gameId, address creator);
     event GameJoined(uint256 gameId, address player);
-    event GameCompleted(uint256 gameId, address winner, uint256 winningTokenId);
+    event GameCompleted(uint256 gameId, address winner, uint256 winningTokenId, uint256 losingTokenId);
+    event FeesWithdrawn(address recipient, uint256 amount);
+    event FeeRecipientUpdated(address newRecipient);
 
     error EmptyItemArray();
     error InvalidGameState();
@@ -34,11 +36,13 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
     mapping(uint256 => Game) public games;
     IERC721 public nftContract;
     uint256[] public availableNFTs;
-    uint256 public totalAvailableNFTs;
     uint256 public reservedNFTs;
+    address public feeRecipient;
+    uint256 public accumulatedFees;
 
     constructor() {
         nftContract = IERC721(0x84c6a2e6765E88427c41bB38C82a78b570e24709);
+        feeRecipient = msg.sender; // Default to contract owner
     }
 
     function getRandomNumber(uint64 min, uint64 max) public view returns (uint64) {
@@ -49,12 +53,13 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
         for (uint256 i = 0; i < tokenIds.length; i++) {
             nftContract.safeTransferFrom(msg.sender, address(this), tokenIds[i]);
             availableNFTs.push(tokenIds[i]);
-            totalAvailableNFTs++;
         }
     }
 
     function withdrawNFT(uint256 tokenId) external onlyOwner {
-        require(totalAvailableNFTs - reservedNFTs > 0, "Cannot withdraw: All NFTs are reserved for pending games");
+        uint256 contractBalance = nftContract.balanceOf(address(this));
+        require(contractBalance - reservedNFTs > 0, "Cannot withdraw: All NFTs are reserved for pending games");
+        
         nftContract.safeTransferFrom(address(this), msg.sender, tokenId);
         
         // Remove the token from availableNFTs
@@ -62,7 +67,6 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
             if (availableNFTs[i] == tokenId) {
                 availableNFTs[i] = availableNFTs[availableNFTs.length - 1];
                 availableNFTs.pop();
-                totalAvailableNFTs--;
                 break;
             }
         }
@@ -70,7 +74,9 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
 
     function createGame() external payable returns (uint256) {
         require(msg.value == GAME_FEE, "Must send exactly 1 FLOW");
-        require(totalAvailableNFTs - reservedNFTs >= 2, "Not enough unreserved NFTs available");
+        
+        uint256 contractBalance = nftContract.balanceOf(address(this));
+        require(contractBalance - reservedNFTs >= 2, "Not enough unreserved NFTs available");
 
         uint256 gameId = gameCounter++;
         games[gameId] = Game({
@@ -85,6 +91,9 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
 
         // Reserve 2 NFTs for this game
         reservedNFTs += 2;
+        
+        // Accumulate fees for platform
+        accumulatedFees += GAME_FEE;
 
         emit GameCreated(gameId, msg.sender);
         return gameId;
@@ -99,6 +108,9 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
         require(game.player == address(0), "Game already has a player");
 
         game.player = msg.sender;
+        
+        // Accumulate fees for platform
+        accumulatedFees += GAME_FEE;
         
         // Generate random numbers for both players
         uint64 creatorIndex = getRandomNumber(0, uint64(game.availableNFTs.length - 1));
@@ -121,23 +133,23 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
             winningTokenId = playerTokenId;
         }
 
-        // Transfer NFT to winner
-        nftContract.safeTransferFrom(address(this), winner, winningTokenId);
+        // Transfer NFT to winner (winner gets both NFTs)
+        nftContract.safeTransferFrom(address(this), winner, creatorTokenId);
+        nftContract.safeTransferFrom(address(this), winner, playerTokenId);
         
+        uint256 losingTokenId = creatorTokenId > playerTokenId ? playerTokenId : creatorTokenId;
+
         // Remove used NFT from available pool and update counters
         removeNFTFromPool(winningTokenId);
-        totalAvailableNFTs--;
-        reservedNFTs -= 2; // Release the reservation for this game
+        removeNFTFromPool(losingTokenId);
 
-        // Send FLOW rewards to winner (2 FLOW - total of both players' fees)
-        (bool sent, ) = winner.call{value: GAME_FEE * 2}("");
-        require(sent, "Failed to send FLOW");
+        reservedNFTs -= 2; // Release the reservation for this game
 
         game.isCompleted = true;
         game.isActive = false;
 
         emit GameJoined(gameId, msg.sender);
-        emit GameCompleted(gameId, winner, winningTokenId);
+        emit GameCompleted(gameId, winner, winningTokenId, losingTokenId);
     }
 
     function removeNFTFromPool(uint256 tokenId) internal {
@@ -150,6 +162,38 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
         }
     }
 
+    /**
+     * @dev Set the address that will receive platform fees
+     * @param newRecipient The address to receive fees
+     */
+    function setFeeRecipient(address newRecipient) external onlyOwner {
+        require(newRecipient != address(0), "Fee recipient cannot be zero address");
+        feeRecipient = newRecipient;
+        emit FeeRecipientUpdated(newRecipient);
+    }
+
+    /**
+     * @dev Withdraw accumulated platform fees to the designated recipient
+     */
+    function withdrawFees() external onlyOwner {
+        uint256 amount = accumulatedFees;
+        require(amount > 0, "No fees to withdraw");
+        
+        accumulatedFees = 0;
+        
+        (bool sent, ) = feeRecipient.call{value: amount}("");
+        require(sent, "Failed to send fees");
+        
+        emit FeesWithdrawn(feeRecipient, amount);
+    }
+
+    /**
+     * @dev Get the current accumulated fees
+     */
+    function getAccumulatedFees() external view returns (uint256) {
+        return accumulatedFees;
+    }
+
     function getAvailableNFTs() external view returns (uint256[] memory) {
         return availableNFTs;
     }
@@ -159,6 +203,7 @@ contract PackBattles is CadenceRandomConsumer, ERC721Holder, Ownable(msg.sender)
     }
 
     function getUnreservedNFTCount() external view returns (uint256) {
-        return totalAvailableNFTs - reservedNFTs;
+        uint256 contractBalance = nftContract.balanceOf(address(this));
+        return contractBalance - reservedNFTs;
     }
 }

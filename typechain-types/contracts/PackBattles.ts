@@ -57,12 +57,15 @@ export interface PackBattlesInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "GAME_FEE"
+      | "accumulatedFees"
       | "addNFTs"
       | "availableNFTs"
       | "canFulfillRequest"
       | "createGame"
+      | "feeRecipient"
       | "gameCounter"
       | "games"
+      | "getAccumulatedFees"
       | "getAvailableNFTs"
       | "getGame"
       | "getRandomNumber"
@@ -73,13 +76,16 @@ export interface PackBattlesInterface extends Interface {
       | "owner"
       | "renounceOwnership"
       | "reservedNFTs"
-      | "totalAvailableNFTs"
+      | "setFeeRecipient"
       | "transferOwnership"
+      | "withdrawFees"
       | "withdrawNFT"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
+      | "FeeRecipientUpdated"
+      | "FeesWithdrawn"
       | "GameCompleted"
       | "GameCreated"
       | "GameJoined"
@@ -92,6 +98,10 @@ export interface PackBattlesInterface extends Interface {
   ): EventFragment;
 
   encodeFunctionData(functionFragment: "GAME_FEE", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "accumulatedFees",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "addNFTs",
     values: [BigNumberish[]]
@@ -109,10 +119,18 @@ export interface PackBattlesInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "feeRecipient",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "gameCounter",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "games", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "getAccumulatedFees",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getAvailableNFTs",
     values?: undefined
@@ -151,12 +169,16 @@ export interface PackBattlesInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "totalAvailableNFTs",
-    values?: undefined
+    functionFragment: "setFeeRecipient",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawFees",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawNFT",
@@ -164,6 +186,10 @@ export interface PackBattlesInterface extends Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "GAME_FEE", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "accumulatedFees",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "addNFTs", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "availableNFTs",
@@ -175,10 +201,18 @@ export interface PackBattlesInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "createGame", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "feeRecipient",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "gameCounter",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "games", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getAccumulatedFees",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getAvailableNFTs",
     data: BytesLike
@@ -211,11 +245,15 @@ export interface PackBattlesInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "totalAvailableNFTs",
+    functionFragment: "setFeeRecipient",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawFees",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -224,21 +262,49 @@ export interface PackBattlesInterface extends Interface {
   ): Result;
 }
 
+export namespace FeeRecipientUpdatedEvent {
+  export type InputTuple = [newRecipient: AddressLike];
+  export type OutputTuple = [newRecipient: string];
+  export interface OutputObject {
+    newRecipient: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FeesWithdrawnEvent {
+  export type InputTuple = [recipient: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [recipient: string, amount: bigint];
+  export interface OutputObject {
+    recipient: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace GameCompletedEvent {
   export type InputTuple = [
     gameId: BigNumberish,
     winner: AddressLike,
-    winningTokenId: BigNumberish
+    winningTokenId: BigNumberish,
+    losingTokenId: BigNumberish
   ];
   export type OutputTuple = [
     gameId: bigint,
     winner: string,
-    winningTokenId: bigint
+    winningTokenId: bigint,
+    losingTokenId: bigint
   ];
   export interface OutputObject {
     gameId: bigint;
     winner: string;
     winningTokenId: bigint;
+    losingTokenId: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -424,6 +490,8 @@ export interface PackBattles extends BaseContract {
 
   GAME_FEE: TypedContractMethod<[], [bigint], "view">;
 
+  accumulatedFees: TypedContractMethod<[], [bigint], "view">;
+
   addNFTs: TypedContractMethod<
     [tokenIds: BigNumberish[]],
     [void],
@@ -439,6 +507,8 @@ export interface PackBattles extends BaseContract {
   >;
 
   createGame: TypedContractMethod<[], [bigint], "payable">;
+
+  feeRecipient: TypedContractMethod<[], [string], "view">;
 
   gameCounter: TypedContractMethod<[], [bigint], "view">;
 
@@ -456,6 +526,8 @@ export interface PackBattles extends BaseContract {
     ],
     "view"
   >;
+
+  getAccumulatedFees: TypedContractMethod<[], [bigint], "view">;
 
   getAvailableNFTs: TypedContractMethod<[], [bigint[]], "view">;
 
@@ -489,13 +561,19 @@ export interface PackBattles extends BaseContract {
 
   reservedNFTs: TypedContractMethod<[], [bigint], "view">;
 
-  totalAvailableNFTs: TypedContractMethod<[], [bigint], "view">;
+  setFeeRecipient: TypedContractMethod<
+    [newRecipient: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
     "nonpayable"
   >;
+
+  withdrawFees: TypedContractMethod<[], [void], "nonpayable">;
 
   withdrawNFT: TypedContractMethod<
     [tokenId: BigNumberish],
@@ -511,6 +589,9 @@ export interface PackBattles extends BaseContract {
     nameOrSignature: "GAME_FEE"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "accumulatedFees"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "addNFTs"
   ): TypedContractMethod<[tokenIds: BigNumberish[]], [void], "nonpayable">;
   getFunction(
@@ -522,6 +603,9 @@ export interface PackBattles extends BaseContract {
   getFunction(
     nameOrSignature: "createGame"
   ): TypedContractMethod<[], [bigint], "payable">;
+  getFunction(
+    nameOrSignature: "feeRecipient"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "gameCounter"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -541,6 +625,9 @@ export interface PackBattles extends BaseContract {
     ],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "getAccumulatedFees"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "getAvailableNFTs"
   ): TypedContractMethod<[], [bigint[]], "view">;
@@ -584,15 +671,32 @@ export interface PackBattles extends BaseContract {
     nameOrSignature: "reservedNFTs"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "totalAvailableNFTs"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "setFeeRecipient"
+  ): TypedContractMethod<[newRecipient: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "withdrawFees"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "withdrawNFT"
   ): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
 
+  getEvent(
+    key: "FeeRecipientUpdated"
+  ): TypedContractEvent<
+    FeeRecipientUpdatedEvent.InputTuple,
+    FeeRecipientUpdatedEvent.OutputTuple,
+    FeeRecipientUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FeesWithdrawn"
+  ): TypedContractEvent<
+    FeesWithdrawnEvent.InputTuple,
+    FeesWithdrawnEvent.OutputTuple,
+    FeesWithdrawnEvent.OutputObject
+  >;
   getEvent(
     key: "GameCompleted"
   ): TypedContractEvent<
@@ -658,7 +762,29 @@ export interface PackBattles extends BaseContract {
   >;
 
   filters: {
-    "GameCompleted(uint256,address,uint256)": TypedContractEvent<
+    "FeeRecipientUpdated(address)": TypedContractEvent<
+      FeeRecipientUpdatedEvent.InputTuple,
+      FeeRecipientUpdatedEvent.OutputTuple,
+      FeeRecipientUpdatedEvent.OutputObject
+    >;
+    FeeRecipientUpdated: TypedContractEvent<
+      FeeRecipientUpdatedEvent.InputTuple,
+      FeeRecipientUpdatedEvent.OutputTuple,
+      FeeRecipientUpdatedEvent.OutputObject
+    >;
+
+    "FeesWithdrawn(address,uint256)": TypedContractEvent<
+      FeesWithdrawnEvent.InputTuple,
+      FeesWithdrawnEvent.OutputTuple,
+      FeesWithdrawnEvent.OutputObject
+    >;
+    FeesWithdrawn: TypedContractEvent<
+      FeesWithdrawnEvent.InputTuple,
+      FeesWithdrawnEvent.OutputTuple,
+      FeesWithdrawnEvent.OutputObject
+    >;
+
+    "GameCompleted(uint256,address,uint256,uint256)": TypedContractEvent<
       GameCompletedEvent.InputTuple,
       GameCompletedEvent.OutputTuple,
       GameCompletedEvent.OutputObject
