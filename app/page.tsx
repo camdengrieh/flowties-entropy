@@ -6,6 +6,7 @@ import RandomList from './components/RandomList';
 import YoloRoll from './components/YoloRoll';
 import SocialSelector from './components/SocialSelector';
 import StakingModal from './components/StakingModal';
+import PackBattles from './components/PackBattles';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('number');
@@ -63,6 +64,15 @@ export default function Home() {
               </div>
             </button>
             <button
+              onClick={() => setActiveTab('battles')}
+              className={`relative group ${activeTab === 'battles' ? 'scale-105' : ''}`}
+            >
+              <div className={`absolute -inset-0.5 bg-gradient-to-r from-neon-purple to-neon-blue rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-1000 ${activeTab === 'battles' ? 'opacity-100' : ''}`}></div>
+              <div className={`relative px-3 py-2 md:px-6 bg-black rounded-xl font-press-start text-xs md:text-sm ${activeTab === 'battles' ? 'text-neon-blue' : 'text-white'} group-hover:text-neon-blue transition-all duration-300`}>
+                Pack Battles
+              </div>
+            </button>
+            <button
               onClick={() => setShowYolo(true)}
               className="relative group"
             >
@@ -87,6 +97,7 @@ export default function Home() {
             {activeTab === 'number' && <RandomNumber />}
             {activeTab === 'list' && <RandomList />}
             {activeTab === 'social' && <SocialSelector />}
+            {activeTab === 'battles' && <PackBattles />}
           </div>
         </div>
       </div>

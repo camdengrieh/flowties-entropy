@@ -2,7 +2,7 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/camdengrieh/Documents-Local/github/flowties-entropy/contracts/PackBattles.sol": {
-      "lastModificationDate": 1748732910173,
+      "lastModificationDate": 1748756123125,
       "contentHash": "a3d7017356564bbb1bb9f3716f6f6179",
       "sourceName": "contracts/PackBattles.sol",
       "solcConfig": {
@@ -376,8 +376,8 @@
       ]
     },
     "/Users/camdengrieh/Documents-Local/github/flowties-entropy/contracts/PackOpening.sol": {
-      "lastModificationDate": 1748686562391,
-      "contentHash": "c0d3f360c3d75b013522f145d3ed2bbb",
+      "lastModificationDate": 1748756459101,
+      "contentHash": "b903dff687700254549f00d6cde57849",
       "sourceName": "contracts/PackOpening.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -404,7 +404,10 @@
         }
       },
       "imports": [
-        "@onflow/flow-sol-utils/src/random/CadenceRandomConsumer.sol"
+        "@onflow/flow-sol-utils/src/random/CadenceRandomConsumer.sol",
+        "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
         "^0.8.19"

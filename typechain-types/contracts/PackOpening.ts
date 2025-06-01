@@ -9,6 +9,7 @@ import type {
   Result,
   Interface,
   EventFragment,
+  AddressLike,
   ContractRunner,
   ContractMethod,
   Listener,
@@ -22,16 +23,57 @@ import type {
   TypedContractMethod,
 } from "../common";
 
+export declare namespace PackOpening {
+  export type PackOpeningRecordStruct = {
+    round: BigNumberish;
+    player: AddressLike;
+    tokenId: BigNumberish;
+    timestamp: BigNumberish;
+  };
+
+  export type PackOpeningRecordStructOutput = [
+    round: bigint,
+    player: string,
+    tokenId: bigint,
+    timestamp: bigint
+  ] & { round: bigint; player: string; tokenId: bigint; timestamp: bigint };
+}
+
 export interface PackOpeningInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "MAX_PACK_SIZE"
+      | "PACK_COST"
+      | "addNFTs"
+      | "allPackOpenings"
+      | "availableNFTs"
       | "canFulfillRequest"
+      | "currentRound"
+      | "getAllPackOpenings"
+      | "getAvailableNFTCount"
+      | "getAvailableNFTs"
+      | "getContractBalance"
+      | "getPackOpeningRecord"
+      | "getPlayerPackOpenings"
       | "getRandomNumber"
+      | "nftContract"
+      | "onERC721Received"
+      | "openPack"
+      | "owner"
+      | "packOpeningRecords"
+      | "renounceOwnership"
       | "selectRandomItem"
+      | "transferOwnership"
+      | "withdrawFunds"
+      | "withdrawNFT"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
+      | "NFTWithdrawn"
+      | "NFTsAdded"
+      | "OwnershipTransferred"
+      | "PackOpened"
       | "RandomItemSelected"
       | "RandomNumberGenerated"
       | "RandomnessFulfilled"
@@ -40,20 +82,137 @@ export interface PackOpeningInterface extends Interface {
   ): EventFragment;
 
   encodeFunctionData(
+    functionFragment: "MAX_PACK_SIZE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "PACK_COST", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "addNFTs",
+    values: [BigNumberish[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "allPackOpenings",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "availableNFTs",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "canFulfillRequest",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "currentRound",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAllPackOpenings",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAvailableNFTCount",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAvailableNFTs",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getContractBalance",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPackOpeningRecord",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPlayerPackOpenings",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getRandomNumber",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "nftContract",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC721Received",
+    values: [AddressLike, AddressLike, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(functionFragment: "openPack", values?: undefined): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "packOpeningRecords",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "renounceOwnership",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "selectRandomItem",
     values: [string[]]
   ): string;
+  encodeFunctionData(
+    functionFragment: "transferOwnership",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawFunds",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawNFT",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(
+    functionFragment: "MAX_PACK_SIZE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "PACK_COST", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "addNFTs", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "allPackOpenings",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "availableNFTs",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "canFulfillRequest",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "currentRound",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllPackOpenings",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAvailableNFTCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAvailableNFTs",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getContractBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPackOpeningRecord",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPlayerPackOpenings",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -61,9 +220,94 @@ export interface PackOpeningInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "nftContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC721Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "openPack", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "packOpeningRecords",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "selectRandomItem",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawFunds",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawNFT",
+    data: BytesLike
+  ): Result;
+}
+
+export namespace NFTWithdrawnEvent {
+  export type InputTuple = [tokenId: BigNumberish];
+  export type OutputTuple = [tokenId: bigint];
+  export interface OutputObject {
+    tokenId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace NFTsAddedEvent {
+  export type InputTuple = [tokenIds: BigNumberish[]];
+  export type OutputTuple = [tokenIds: bigint[]];
+  export interface OutputObject {
+    tokenIds: bigint[];
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OwnershipTransferredEvent {
+  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+  export type OutputTuple = [previousOwner: string, newOwner: string];
+  export interface OutputObject {
+    previousOwner: string;
+    newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PackOpenedEvent {
+  export type InputTuple = [
+    round: BigNumberish,
+    player: AddressLike,
+    tokenId: BigNumberish
+  ];
+  export type OutputTuple = [round: bigint, player: string, tokenId: bigint];
+  export interface OutputObject {
+    round: bigint;
+    player: string;
+    tokenId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace RandomItemSelectedEvent {
@@ -203,9 +447,60 @@ export interface PackOpening extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  MAX_PACK_SIZE: TypedContractMethod<[], [bigint], "view">;
+
+  PACK_COST: TypedContractMethod<[], [bigint], "view">;
+
+  addNFTs: TypedContractMethod<
+    [tokenIds: BigNumberish[]],
+    [void],
+    "nonpayable"
+  >;
+
+  allPackOpenings: TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, string, bigint, bigint] & {
+        round: bigint;
+        player: string;
+        tokenId: bigint;
+        timestamp: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  availableNFTs: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+
   canFulfillRequest: TypedContractMethod<
     [requestId: BigNumberish],
     [boolean],
+    "view"
+  >;
+
+  currentRound: TypedContractMethod<[], [bigint], "view">;
+
+  getAllPackOpenings: TypedContractMethod<
+    [],
+    [PackOpening.PackOpeningRecordStructOutput[]],
+    "view"
+  >;
+
+  getAvailableNFTCount: TypedContractMethod<[], [bigint], "view">;
+
+  getAvailableNFTs: TypedContractMethod<[], [bigint[]], "view">;
+
+  getContractBalance: TypedContractMethod<[], [bigint], "view">;
+
+  getPackOpeningRecord: TypedContractMethod<
+    [round: BigNumberish],
+    [PackOpening.PackOpeningRecordStructOutput],
+    "view"
+  >;
+
+  getPlayerPackOpenings: TypedContractMethod<
+    [player: AddressLike],
+    [PackOpening.PackOpeningRecordStructOutput[]],
     "view"
   >;
 
@@ -215,15 +510,115 @@ export interface PackOpening extends BaseContract {
     "view"
   >;
 
+  nftContract: TypedContractMethod<[], [string], "view">;
+
+  onERC721Received: TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish, arg3: BytesLike],
+    [string],
+    "nonpayable"
+  >;
+
+  openPack: TypedContractMethod<[], [bigint], "payable">;
+
+  owner: TypedContractMethod<[], [string], "view">;
+
+  packOpeningRecords: TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, string, bigint, bigint] & {
+        round: bigint;
+        player: string;
+        tokenId: bigint;
+        timestamp: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+
   selectRandomItem: TypedContractMethod<[items: string[]], [string], "view">;
+
+  transferOwnership: TypedContractMethod<
+    [newOwner: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  withdrawFunds: TypedContractMethod<[], [void], "nonpayable">;
+
+  withdrawNFT: TypedContractMethod<
+    [tokenId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
   getFunction(
+    nameOrSignature: "MAX_PACK_SIZE"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "PACK_COST"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "addNFTs"
+  ): TypedContractMethod<[tokenIds: BigNumberish[]], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "allPackOpenings"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, string, bigint, bigint] & {
+        round: bigint;
+        player: string;
+        tokenId: bigint;
+        timestamp: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "availableNFTs"
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+  getFunction(
     nameOrSignature: "canFulfillRequest"
   ): TypedContractMethod<[requestId: BigNumberish], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "currentRound"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getAllPackOpenings"
+  ): TypedContractMethod<
+    [],
+    [PackOpening.PackOpeningRecordStructOutput[]],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getAvailableNFTCount"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getAvailableNFTs"
+  ): TypedContractMethod<[], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "getContractBalance"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getPackOpeningRecord"
+  ): TypedContractMethod<
+    [round: BigNumberish],
+    [PackOpening.PackOpeningRecordStructOutput],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getPlayerPackOpenings"
+  ): TypedContractMethod<
+    [player: AddressLike],
+    [PackOpening.PackOpeningRecordStructOutput[]],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "getRandomNumber"
   ): TypedContractMethod<
@@ -232,9 +627,79 @@ export interface PackOpening extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "nftContract"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "onERC721Received"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish, arg3: BytesLike],
+    [string],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "openPack"
+  ): TypedContractMethod<[], [bigint], "payable">;
+  getFunction(
+    nameOrSignature: "owner"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "packOpeningRecords"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, string, bigint, bigint] & {
+        round: bigint;
+        player: string;
+        tokenId: bigint;
+        timestamp: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "renounceOwnership"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "selectRandomItem"
   ): TypedContractMethod<[items: string[]], [string], "view">;
+  getFunction(
+    nameOrSignature: "transferOwnership"
+  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "withdrawFunds"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "withdrawNFT"
+  ): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
 
+  getEvent(
+    key: "NFTWithdrawn"
+  ): TypedContractEvent<
+    NFTWithdrawnEvent.InputTuple,
+    NFTWithdrawnEvent.OutputTuple,
+    NFTWithdrawnEvent.OutputObject
+  >;
+  getEvent(
+    key: "NFTsAdded"
+  ): TypedContractEvent<
+    NFTsAddedEvent.InputTuple,
+    NFTsAddedEvent.OutputTuple,
+    NFTsAddedEvent.OutputObject
+  >;
+  getEvent(
+    key: "OwnershipTransferred"
+  ): TypedContractEvent<
+    OwnershipTransferredEvent.InputTuple,
+    OwnershipTransferredEvent.OutputTuple,
+    OwnershipTransferredEvent.OutputObject
+  >;
+  getEvent(
+    key: "PackOpened"
+  ): TypedContractEvent<
+    PackOpenedEvent.InputTuple,
+    PackOpenedEvent.OutputTuple,
+    PackOpenedEvent.OutputObject
+  >;
   getEvent(
     key: "RandomItemSelected"
   ): TypedContractEvent<
@@ -272,6 +737,50 @@ export interface PackOpening extends BaseContract {
   >;
 
   filters: {
+    "NFTWithdrawn(uint256)": TypedContractEvent<
+      NFTWithdrawnEvent.InputTuple,
+      NFTWithdrawnEvent.OutputTuple,
+      NFTWithdrawnEvent.OutputObject
+    >;
+    NFTWithdrawn: TypedContractEvent<
+      NFTWithdrawnEvent.InputTuple,
+      NFTWithdrawnEvent.OutputTuple,
+      NFTWithdrawnEvent.OutputObject
+    >;
+
+    "NFTsAdded(uint256[])": TypedContractEvent<
+      NFTsAddedEvent.InputTuple,
+      NFTsAddedEvent.OutputTuple,
+      NFTsAddedEvent.OutputObject
+    >;
+    NFTsAdded: TypedContractEvent<
+      NFTsAddedEvent.InputTuple,
+      NFTsAddedEvent.OutputTuple,
+      NFTsAddedEvent.OutputObject
+    >;
+
+    "OwnershipTransferred(address,address)": TypedContractEvent<
+      OwnershipTransferredEvent.InputTuple,
+      OwnershipTransferredEvent.OutputTuple,
+      OwnershipTransferredEvent.OutputObject
+    >;
+    OwnershipTransferred: TypedContractEvent<
+      OwnershipTransferredEvent.InputTuple,
+      OwnershipTransferredEvent.OutputTuple,
+      OwnershipTransferredEvent.OutputObject
+    >;
+
+    "PackOpened(uint256,address,uint256)": TypedContractEvent<
+      PackOpenedEvent.InputTuple,
+      PackOpenedEvent.OutputTuple,
+      PackOpenedEvent.OutputObject
+    >;
+    PackOpened: TypedContractEvent<
+      PackOpenedEvent.InputTuple,
+      PackOpenedEvent.OutputTuple,
+      PackOpenedEvent.OutputObject
+    >;
+
     "RandomItemSelected(string,uint256)": TypedContractEvent<
       RandomItemSelectedEvent.InputTuple,
       RandomItemSelectedEvent.OutputTuple,

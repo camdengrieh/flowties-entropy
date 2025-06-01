@@ -4,7 +4,7 @@ import { PackBattles } from "../typechain-types";
 async function main() {
   // Get the deployed contract address from the deployment script
   const [deployer] = await ethers.getSigners();
-  const packBattles = await ethers.getContractAt("PackBattles", "0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8") as PackBattles;
+  const packBattles = await ethers.getContractAt("PackBattles", "0x9b4568cE546c1c54f15720783FE1744C20fF1914") as PackBattles;
   
   // // Check if there are enough unreserved NFTs
   // const unreservedNFTs = await packBattles.getUnreservedNFTCount();
